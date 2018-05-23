@@ -8,6 +8,11 @@ cron job, and having the results emailed to you.
 domainspy uses the [namecheap.domains.check method](https://www.namecheap.com/support/api/methods/domains/check.aspx)
 of the [Namecheap API](https://www.namecheap.com/support/api/intro.aspx).
 
+Fair warning: I don't plan to do much with this project. Feature requests
+probably won't be fulfilled in a timely manner, if at all. I created this for my
+own use, but I wanted to share it here so that others could learn from it and
+fork it as needed.
+
 ## Usage
 
 ### Set up
