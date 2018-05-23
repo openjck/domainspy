@@ -1,0 +1,16 @@
+{
+    "name": "domainspy",
+    "scripts": {
+        "start": "node .",
+        "test": "npm run lint",
+        "lint": "eslint --ext .js . --ext .json --ignore-path domains.json ."
+    },
+    "dependencies": {
+        "request": "^2.85.0",
+        "xml2js": "^0.4.19"
+    },
+    "devDependencies": {
+        "eslint": "^4.19.1",
+        "eslint-plugin-json": "^1.2.0"
+    }
+}
