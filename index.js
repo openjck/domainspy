@@ -10,7 +10,7 @@ if (fs.existsSync(configFile)) {
     const domainsToCheck = JSON.parse(fs.readFileSync(configFile, 'utf8'));
     checkDomains(server, domainsToCheck);
 } else {
-    exit(`File ${configFile} does not exist.`);
+    exit(`Error: File ${configFile} does not exist.`);
 }
 
 /**
