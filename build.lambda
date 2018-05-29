@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+
+mkdir -p build
+npm install
+zip -r build/lambda.zip index.js domains.json node_modules

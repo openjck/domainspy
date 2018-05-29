@@ -1,4 +1,5 @@
 domains.json
+build/
 
 # Node
 node_modules/

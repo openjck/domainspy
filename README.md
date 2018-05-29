@@ -1,31 +1,26 @@
-domainspy helps you monitor domains for availability. Provide a list of domains
-that you care about, run the script, and domainspy will tell you if any of them
-are available.
+domainspy is an [AWS Lambda](https://aws.amazon.com/lambda/) function that
+monitors domains and notifies you when they're available.
 
-You might want to consider running domainspy automatically, for example as a
-cron job, and having the results emailed to you.
+Provide a list of domains that you care about, install the function on Lambda,
+invoke it (or schedule it to be invoked automatically), and domainspy will tell
+when if any of the domains are available.
 
 domainspy uses the [namecheap.domains.check method](https://www.namecheap.com/support/api/methods/domains/check.aspx)
 of the [Namecheap API](https://www.namecheap.com/support/api/intro.aspx).
 
-Fair warning: I don't plan to do much with this project. Feature requests
-probably won't be fulfilled in a timely manner, if at all. I created this for my
-own use, but I wanted to share it here so that others could learn from it and
-fork it as needed.
+Fair warning: I created this project for my own use and won't spend a lot of
+time responding to feature requests. But feel free to fork away.
 
 ## Usage
 
 ### Set up
 
-1. Set up the API
-    1. Sign up for a free [Namecheap API](https://www.namecheap.com/support/api/intro.aspx) account
-        * If Namecheap doesn't respond to your request for API access within a
-          couple of days, contact support. They can usually speed things up.
-        * You don't need to request sandbox API access unless you plan to modify
-          or test this script.
-    2. Make note of your username and API key
-    3. Whitelist your IP address in the Namecheap API settings
-2. Create a file named *domains.json* at the root of this repository. The file
+1. Sign up for a free [Namecheap API](https://www.namecheap.com/support/api/intro.aspx) account
+    * If Namecheap doesn't respond to your request for API access within a
+      couple of days, contact support. They can usually speed things up.
+    * You don't need to request sandbox API access unless you plan to modify or
+      test this script.
+2. Create a file named *domains.json* at the root of this directory. The file
    should be an array of strings, where each string is a domain that you want to
    monitor. For example:
 
@@ -37,17 +32,32 @@ fork it as needed.
    ]
    ```
 
-### Install
+### Deploy to AWS Lambda
 
-1. [Install Node and NPM](https://nodejs.org/en/download/)
-2. Run `npm install`
+1. [Create an AWS Lambda function](https://docs.aws.amazon.com/lambda/latest/dg/getting-started.html)
+   for domainspy
+    * Be sure to set the following environment variables
+        * `USERNAME` (your Namecheap API username)
+        * `API_KEY` (your Namecheap API password)
+        * `EMAIL_FROM` (the email address that you want to send mail from)
+        * `EMAIL_TO` (the email address that you want to send results to)
+        * `REGION` (your AWS region)
+2. Run `./build.lambda`
+3. Import *build/lambda.zip* as your Lambda project source
+4. [Enable outgoing email](http://www.wisdomofjim.com/blog/sending-an-email-from-aws-lambda-function-in-nodejs-with-aws-simple-email-service)
+   from the email address you chose as the value of `EMAIL_FROM`
 
 ### Run
 
-Run `USERNAME=username API_KEY=apikey CLIENT_IP=ipaddress npm start`
+#### Manually
 
-Tip: To set your IP address automatically, try something like this:
-`` CLIENT_IP=`curl --silent icanhazip.com` ``
+1. Install the [AWS CLI](https://aws.amazon.com/cli/)
+2. Run `aws lambda invoke --invocation-type Event --function-name domainspy /dev/null`
+
+#### Automatically
+
+[Schedule the function](https://docs.aws.amazon.com/AmazonCloudWatch/latest/events/RunLambdaSchedule.html)
+to run automatically
 
 ### Test
 

@@ -1,11 +1,13 @@
 {
     "name": "domainspy",
     "scripts": {
-        "start": "node .",
+        "start": "node run",
         "test": "npm run lint",
         "lint": "eslint --ext .js,.json --ignore-path domains.json ."
     },
     "dependencies": {
+        "aws-sdk": "^2.247.1",
+        "ip": "^1.1.5",
         "request": "^2.85.0",
         "xml2js": "^0.4.19"
     },

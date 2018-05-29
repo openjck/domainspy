@@ -1,30 +1,36 @@
 const fs = require('fs');
 const request = require('request');
+const ip = require('ip');
 const xml2js = require('xml2js');
+const aws = require('aws-sdk');
 
 
 const configFile = 'domains.json';
 
-if (fs.existsSync(configFile)) {
-    const server = getServer();
-    const domainsToCheck = JSON.parse(fs.readFileSync(configFile, 'utf8'));
-    checkDomains(server, domainsToCheck);
-} else {
-    exit(`Error: File ${configFile} does not exist.`);
-}
+exports.handler = (event, context) => {
+    if (fs.existsSync(configFile)) {
+        const server = getServer();
+        const domainsToCheck = JSON.parse(fs.readFileSync(configFile, 'utf8'));
+        checkDomains(server, domainsToCheck, event, context);
+    } else {
+        exit(`Error: File ${configFile} does not exist.`);
+        context.fail(event);
+    }
+};
 
 /**
  * Print one or more error messages and exit.
  *
  * messageOrMessages can be either a string or an array of strings.
  */
-function exit(messageOrMessages, code = 1) {
+function exit(messageOrMessages, event, context, code = 1) {
     if (Array.isArray(messageOrMessages)) {
         messageOrMessages.forEach(console.error);
     } else {
         console.error(messageOrMessages);
     }
 
+    context.fail(event);
     process.exit(code);
 }
 
@@ -40,15 +46,15 @@ function getServer() {
     return server;
 }
 
-function checkDomains(server, domainsToCheck) {
+function checkDomains(server, domainsToCheck, event, context) {
     const domainsReturned = [];
     const availableDomains = [];
 
-    request(`${server}/xml.response?ApiUser=${process.env.USERNAME}&ApiKey=${process.env.API_KEY}&UserName=${process.env.USERNAME}&Command=namecheap.domains.check&ClientIp=${process.env.CLIENT_IP}&DomainList=${domainsToCheck.join(',')}`, (requestError, response, body) => {
-        if (requestError) return exit(requestError);
+    request(`${server}/xml.response?ApiUser=${process.env.USERNAME}&ApiKey=${process.env.API_KEY}&UserName=${process.env.USERNAME}&Command=namecheap.domains.check&ClientIp=${ip.address()}&DomainList=${domainsToCheck.join(',')}`, (requestError, response, body) => {
+        if (requestError) exit(requestError, event, context);
 
         xml2js.parseString(body, (xmlParseError, result) => {
-            if (xmlParseError) return exit(xmlParseError);
+            if (xmlParseError) exit(xmlParseError, event, context);
 
             const apiResponse = result.ApiResponse;
 
@@ -57,7 +63,7 @@ function checkDomains(server, domainsToCheck) {
                 apiResponse.Errors.forEach(e1 => {
                     e1.Error.forEach(e2 => apiErrors.push(e2));
                 });
-                return exit(apiErrors);
+                exit(apiErrors, event, context);
             }
 
             apiResponse.CommandResponse.forEach(cr => {
@@ -77,13 +83,43 @@ function checkDomains(server, domainsToCheck) {
             });
         });
 
+        let emailSubject, emailBody;
         if (!availableDomains.length > 0) {
-            console.log('No domains are currently available.');
+            emailSubject = 'domainspy: No domains available';
+            emailBody = 'No domains are currently available.';
         } else {
-            availableDomains.forEach(ad => {
-                console.log(`${ad} is available.`);
-            });
+            emailSubject = 'domainspy: DOMAINS AVAILABLE!';
+            emailBody = availableDomains.map(ad => {
+                return `${ad} is available.`;
+            }).join('\n');
         }
+
+        const ses = new aws.SES({
+            region: process.env.REGION,
+        });
+        ses.sendEmail({
+            Destination: {
+                ToAddresses: [process.env.EMAIL_TO],
+            },
+            Message: {
+                Body: {
+                    Text: {
+                        Data: emailBody,
+                    },
+                },
+                Subject: {
+                    Data: emailSubject,
+                },
+            },
+            Source: process.env.EMAIL_FROM,
+        }, (err, data) => {
+            if (err) {
+                exit(err, event, context);
+            } else {
+                console.log(data);
+                context.succeed(event);
+            }
+        });
 
         const missingDomainErrors = [];
         domainsToCheck.forEach(domainToCheck => {
@@ -93,7 +129,7 @@ function checkDomains(server, domainsToCheck) {
         });
 
         if (missingDomainErrors.length > 0) {
-            return exit(missingDomainErrors);
+            exit(missingDomainErrors, event, context);
         }
     });
 }
