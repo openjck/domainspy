@@ -43,10 +43,7 @@ understanding.
 
 ### Run
 
-Run `USERNAME=username API_KEY=apikey CLIENT_IP=ipaddress npm start`
-
-Tip: To set your IP address automatically, try something like this:
-`` CLIENT_IP=`curl --silent icanhazip.com` ``
+Run `USERNAME=username API_KEY=apikey npm start`
 
 ### Test
 

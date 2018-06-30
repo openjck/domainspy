@@ -1,5 +1,6 @@
 const fs = require('fs');
 const request = require('request');
+const ip = require('ip');
 const xml2js = require('xml2js');
 
 
@@ -44,7 +45,7 @@ function checkDomains(server, domainsToCheck) {
     const domainsReturned = [];
     const availableDomains = [];
 
-    request(`${server}/xml.response?ApiUser=${process.env.USERNAME}&ApiKey=${process.env.API_KEY}&UserName=${process.env.USERNAME}&Command=namecheap.domains.check&ClientIp=${process.env.CLIENT_IP}&DomainList=${domainsToCheck.join(',')}`, (requestError, response, body) => {
+    request(`${server}/xml.response?ApiUser=${process.env.USERNAME}&ApiKey=${process.env.API_KEY}&UserName=${process.env.USERNAME}&Command=namecheap.domains.check&ClientIp=${ip.address()}&DomainList=${domainsToCheck.join(',')}`, (requestError, response, body) => {
         if (requestError) return exit(requestError);
 
         xml2js.parseString(body, (xmlParseError, result) => {
