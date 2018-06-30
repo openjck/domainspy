@@ -1,3 +1,5 @@
+require('dotenv').config();
+
 const fs = require('fs');
 const request = require('request');
 const ip = require('ip');
@@ -32,7 +34,7 @@ function exit(messageOrMessages, code = 1) {
 function getServer() {
     let server;
 
-    if (!process.env.SANDBOX || process.env.SANDBOX !== 'true') {
+    if (!process.env.USE_SANDBOX_NAMECHEAP_API || process.env.USE_SANDBOX_NAMECHEAP_API !== 'true') {
         server = 'https://api.namecheap.com';
     } else {
         server = 'https://api.sandbox.namecheap.com';
@@ -45,7 +47,7 @@ function checkDomains(server, domainsToCheck) {
     const domainsReturned = [];
     const availableDomains = [];
 
-    request(`${server}/xml.response?ApiUser=${process.env.USERNAME}&ApiKey=${process.env.API_KEY}&UserName=${process.env.USERNAME}&Command=namecheap.domains.check&ClientIp=${ip.address()}&DomainList=${domainsToCheck.join(',')}`, (requestError, response, body) => {
+    request(`${server}/xml.response?ApiUser=${process.env.NAMECHEAP_USERNAME}&ApiKey=${process.env.NAMECHEAP_API_KEY}&UserName=${process.env.NAMECHEAP_USERNAME}&Command=namecheap.domains.check&ClientIp=${ip.address()}&DomainList=${domainsToCheck.join(',')}`, (requestError, response, body) => {
         if (requestError) exit(requestError);
 
         xml2js.parseString(body, (xmlParseError, result) => {

@@ -1,4 +1,5 @@
 domains.json
+.env
 
 # Node
 node_modules/

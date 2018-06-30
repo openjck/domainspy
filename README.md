@@ -24,7 +24,15 @@ understanding.
       test this script.
     * Make note of your username and API key
 2. Whitelist your IP address in the Namecheap API settings
-3. Create a file named *domains.json* at the root of this repository. The file
+3. Create a file named *.env* to modify settings and specify your Namecheap
+   username and API key. For example:
+
+   ```sh
+    USE_SANDBOX_NAMECHEAP_API=false
+    NAMECHEAP_USERNAME=username
+    NAMECHEAP_API_KEY=apikey
+   ```
+4. Create a file named *domains.json* at the root of this repository. The file
    should be an array of strings, where each string is a domain that you want to
    monitor. For example:
 
@@ -43,7 +51,7 @@ understanding.
 
 ### Run
 
-Run `USERNAME=username API_KEY=apikey npm start`
+Run `npm start`
 
 ### Test
 
