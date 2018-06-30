@@ -46,10 +46,10 @@ function checkDomains(server, domainsToCheck) {
     const availableDomains = [];
 
     request(`${server}/xml.response?ApiUser=${process.env.USERNAME}&ApiKey=${process.env.API_KEY}&UserName=${process.env.USERNAME}&Command=namecheap.domains.check&ClientIp=${ip.address()}&DomainList=${domainsToCheck.join(',')}`, (requestError, response, body) => {
-        if (requestError) return exit(requestError);
+        if (requestError) exit(requestError);
 
         xml2js.parseString(body, (xmlParseError, result) => {
-            if (xmlParseError) return exit(xmlParseError);
+            if (xmlParseError) exit(xmlParseError);
 
             const apiResponse = result.ApiResponse;
 
@@ -58,7 +58,7 @@ function checkDomains(server, domainsToCheck) {
                 apiResponse.Errors.forEach(e1 => {
                     e1.Error.forEach(e2 => apiErrors.push(e2));
                 });
-                return exit(apiErrors);
+                exit(apiErrors);
             }
 
             apiResponse.CommandResponse.forEach(cr => {
@@ -94,7 +94,7 @@ function checkDomains(server, domainsToCheck) {
         });
 
         if (missingDomainErrors.length > 0) {
-            return exit(missingDomainErrors);
+            exit(missingDomainErrors);
         }
     });
 }
