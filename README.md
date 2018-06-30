@@ -1,6 +1,6 @@
-domainspy helps you monitor domains for availability. Provide a list of domains
-that you care about, run the script, and domainspy will tell you if any of them
-are available.
+domainspy monitors domains for availability. Provide a list of domains that you
+want to buy, run the script, and domainspy will tell you if any of them are
+available.
 
 You might want to consider running domainspy automatically, for example as a
 cron job, and having the results emailed to you.
@@ -8,24 +8,23 @@ cron job, and having the results emailed to you.
 domainspy uses the [namecheap.domains.check method](https://www.namecheap.com/support/api/methods/domains/check.aspx)
 of the [Namecheap API](https://www.namecheap.com/support/api/intro.aspx).
 
-Fair warning: I don't plan to do much with this project. Feature requests
-probably won't be fulfilled in a timely manner, if at all. I created this for my
-own use, but I wanted to share it here so that others could learn from it and
-fork it as needed.
+Fair warning: I created this project for my own use. I don't plan to fulfill
+feature requests. I published this code on GitHub under an open-source license
+so that others could learn from it and fork it as needed. Thanks for
+understanding.
 
 ## Usage
 
 ### Set up
 
-1. Set up the API
-    1. Sign up for a free [Namecheap API](https://www.namecheap.com/support/api/intro.aspx) account
-        * If Namecheap doesn't respond to your request for API access within a
-          couple of days, contact support. They can usually speed things up.
-        * You don't need to request sandbox API access unless you plan to modify
-          or test this script.
-    2. Make note of your username and API key
-    3. Whitelist your IP address in the Namecheap API settings
-2. Create a file named *domains.json* at the root of this repository. The file
+1. Sign up for a free [Namecheap API](https://www.namecheap.com/support/api/intro.aspx) account
+    * If Namecheap doesn't respond to your request for API access within a
+      couple of days, contact support. They can speed things up.
+    * You don't need to request sandbox API access unless you plan to modify or
+      test this script.
+    * Make note of your username and API key
+2. Whitelist your IP address in the Namecheap API settings
+3. Create a file named *domains.json* at the root of this repository. The file
    should be an array of strings, where each string is a domain that you want to
    monitor. For example:
 
