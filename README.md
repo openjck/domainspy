@@ -28,9 +28,9 @@ understanding.
    username and API key. For example:
 
    ```sh
-    USE_SANDBOX_NAMECHEAP_API=false
-    NAMECHEAP_USERNAME=username
-    NAMECHEAP_API_KEY=apikey
+   USE_SANDBOX_NAMECHEAP_API=false
+   NAMECHEAP_USERNAME=username
+   NAMECHEAP_API_KEY=apikey
    ```
 4. Create a file named *domains.json* at the root of this repository. The file
    should be an array of strings, where each string is a domain that you want to
