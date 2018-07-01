@@ -28,7 +28,7 @@ understanding.
    username and API key. For example:
 
    ```sh
-   USE_SANDBOX_NAMECHEAP_API=false
+   SANDBOX=false
    NAMECHEAP_USERNAME=username
    NAMECHEAP_API_KEY=apikey
    ```

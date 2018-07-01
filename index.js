@@ -34,7 +34,7 @@ function exit(messageOrMessages, code = 1) {
 function getServer() {
     let server;
 
-    if (!process.env.USE_SANDBOX_NAMECHEAP_API || process.env.USE_SANDBOX_NAMECHEAP_API !== 'true') {
+    if (!process.env.SANDBOX || process.env.SANDBOX !== 'true') {
         server = 'https://api.namecheap.com';
     } else {
         server = 'https://api.sandbox.namecheap.com';
