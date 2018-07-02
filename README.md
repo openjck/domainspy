@@ -17,7 +17,7 @@ needed. I couldn't find anything else like this out there.
 
 ### Set up
 
-1. Sign up for a free [Namecheap API](https://www.namecheap.com/support/api/intro.aspx) account
+1. Sign up for a [Namecheap API](https://www.namecheap.com/support/api/intro.aspx) account
     * If Namecheap doesn't respond to your request for API access within a
       couple of days, contact support. They can speed things up.
     * You don't need to request sandbox API access unless you plan to modify or
