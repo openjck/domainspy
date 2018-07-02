@@ -1,5 +1,6 @@
 {
     "name": "domainspy",
+    "private": true,
     "scripts": {
         "start": "node .",
         "compile": "pkg --out-path bin index.js",
