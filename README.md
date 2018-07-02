@@ -58,9 +58,10 @@ Run `npm start`
 domainspy and its dependencies can be compiled to a single binary for use in
 environments where Node and/or NPM are not available.
 
-Run `npm run compile` to compile the application. If you only care about certain
-targets, you can provide them as options to the command. For example: `npm run
-compile -- --targets node8-linux-x64`.
+Run `npm run compile` to compile the application. By default, `npm run compile`
+builds binaries for a handful of common architectures. If you only want binaries
+for certain architectures, you can specify them like this: `npm run compile --
+--targets node8-linux-x64,node8-macos-x64`.
 
 Remember to put a *domains.json* file and a *.env* file in whatever directory
 you ultimately move the binary to. The application will error out if these
