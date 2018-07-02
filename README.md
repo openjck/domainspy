@@ -32,6 +32,12 @@ needed. I couldn't find anything else like this out there.
    NAMECHEAP_USERNAME=username
    NAMECHEAP_API_KEY=apikey
    ```
+
+   The `SANDBOX` environment variable can be omitted (it defaults to false), but
+   all of the others are required.
+
+   If you don't want to use a *.env* file, you can set these environment
+   variables some other way.
 4. Create a file named *domains.json* at the root of this repository. The file
    should be an array of strings, where each string is a domain that you want to
    monitor. For example:
