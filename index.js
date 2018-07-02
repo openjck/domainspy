@@ -23,7 +23,7 @@ if (fs.existsSync(configFile)) {
  */
 function exit(messageOrMessages, code = 1) {
     if (Array.isArray(messageOrMessages)) {
-        messageOrMessages.forEach(console.error);
+        messageOrMessages.forEach(m => console.error(m));
     } else {
         console.error(messageOrMessages);
     }
@@ -58,7 +58,7 @@ function checkDomains(server, domainsToCheck) {
             if (apiResponse.$.Status.toLowerCase() === 'error') {
                 const apiErrors = [];
                 apiResponse.Errors.forEach(e1 => {
-                    e1.Error.forEach(e2 => apiErrors.push(e2));
+                    e1.Error.forEach(e2 => apiErrors.push(e2._));
                 });
                 exit(apiErrors);
             }
