@@ -2,16 +2,16 @@ domainspy monitors domains for availability. Provide a list of domains that you
 want to buy, run the script, and domainspy will tell you if any of them are
 available.
 
-You might want to consider running domainspy automatically, for example as a
-cron job, and having the results emailed to you.
+Domains can move fast. You might want to consider running domainspy
+automatically, for example as a cron job, and having the results emailed to you.
 
 domainspy uses the [namecheap.domains.check method](https://www.namecheap.com/support/api/methods/domains/check.aspx)
 of the [Namecheap API](https://www.namecheap.com/support/api/intro.aspx).
 
-Fair warning: I created this project for my own use. I don't plan to fulfill
-feature requests. I published this code on GitHub under an open-source license
-so that others could learn from it and fork it as needed. Thanks for
-understanding.
+Fair warning: I created this project for my own use and probably won't respond
+to feature requests in a timely manner, if at all. I wanted to push the code
+under an open-source license so that others could learn from it and fork it as
+needed. I couldn't find anything else like this out there.
 
 ## Usage
 
@@ -21,7 +21,7 @@ understanding.
     * If Namecheap doesn't respond to your request for API access within a
       couple of days, contact support. They can speed things up.
     * You don't need to request sandbox API access unless you plan to modify or
-      test this script.
+      test this script
     * Make note of your username and API key
 2. Whitelist your IP address in the Namecheap API settings
 3. Create a file named *.env* to modify settings and specify your Namecheap
@@ -53,17 +53,18 @@ understanding.
 
 Run `npm start`
 
-#### Running a compiled binary (optional)
+#### Run a compiled binary (optional)
 
-domainspy can be compiled to run in environments where Node and/or NPM are not
-available, for example, on certain shared hosts.
+domainspy and its dependencies can be compiled to a single binary for use in
+environments where Node and/or NPM are not available.
 
 Run `npm run compile` to compile the application. If you only care about certain
-targets, you can provide them as options to the script like this: `npm run
+targets, you can provide them as options to the command. For example: `npm run
 compile -- --targets node8-linux-x64`.
 
-Remember to put a *domains.json* file and a *.env* file in the same directory as
-the binary.
+Remember to put a *domains.json* file and a *.env* in whatever directory you
+ultimately move the binary to. The application will error out if these aren't
+present.
 
 ### Test
 
