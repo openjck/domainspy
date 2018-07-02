@@ -53,6 +53,18 @@ understanding.
 
 Run `npm start`
 
+#### Running a compiled binary (optional)
+
+domainspy can be compiled to run in environments where Node and/or NPM are not
+available, for example, on certain shared hosts.
+
+Run `npm run compile` to compile the application. If you only care about certain
+targets, you can provide them as options to the script like this: `npm run
+compile -- --targets node8-linux-x64`.
+
+Remember to put a *domains.json* file and a *.env* file in the same directory as
+the binary.
+
 ### Test
 
 Run `npm test`

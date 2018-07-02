@@ -4,3 +4,6 @@ domains.json
 # Node
 node_modules/
 npm-debug.log
+
+# Generated files
+bin/
