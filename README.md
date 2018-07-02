@@ -9,7 +9,7 @@ domainspy uses the [namecheap.domains.check method](https://www.namecheap.com/su
 of the [Namecheap API](https://www.namecheap.com/support/api/intro.aspx).
 
 Fair warning: I created this project for my own use and probably won't respond
-to feature requests in a timely manner, if at all. I wanted to push the code
+to feature requests in a timely manner, if at all. I wanted to publish the code
 under an open-source license so that others could learn from it and fork it as
 needed. I couldn't find anything else like this out there.
 
