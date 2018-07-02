@@ -63,9 +63,10 @@ builds binaries for a handful of common architectures. If you only want binaries
 for certain architectures, you can specify them like this: `npm run compile --
 --targets node8-linux-x64,node8-macos-x64`.
 
-Remember to put a *domains.json* file and a *.env* file in whatever directory
-you ultimately move the binary to. The application will error out if these
-aren't present.
+Remember to put a *domains.json* file in whatever directory you ultimately move
+the binary to. The application will error out if it isn't present. You will also
+need to put a *.env* file in that directory or set the required environment
+variables some other way.
 
 ### Test
 
