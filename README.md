@@ -62,9 +62,9 @@ Run `npm run compile` to compile the application. If you only care about certain
 targets, you can provide them as options to the command. For example: `npm run
 compile -- --targets node8-linux-x64`.
 
-Remember to put a *domains.json* file and a *.env* in whatever directory you
-ultimately move the binary to. The application will error out if these aren't
-present.
+Remember to put a *domains.json* file and a *.env* file in whatever directory
+you ultimately move the binary to. The application will error out if these
+aren't present.
 
 ### Test
 
