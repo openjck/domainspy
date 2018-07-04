@@ -43,43 +43,82 @@ function getServer() {
     return server;
 }
 
+/**
+ * Split an array into smaller chunks.
+ *
+ * For example:
+ *
+ *     const arr = [1, 2, 3, 4, 5, 6, 7, 8];
+ *     splitArray(arr, 2) => [[1, 2], [3, 4], [5, 6], [7, 8]]
+ *
+ * Based on:
+ * http://www.frontcoded.com/splitting-javascript-array-into-chunks.html
+ */
+function splitArray(array, size) {
+    const arrayGroup = [];
+
+    for (let i = 0; i < array.length; i += size) {
+        arrayGroup.push(array.slice(i, i + size));
+    }
+
+    return arrayGroup;
+}
+
 function checkDomains(server, domainsToCheck) {
     const domainsReturned = [];
     const availableDomains = [];
+    const promises = [];
 
-    request(`${server}/xml.response?ApiUser=${process.env.NAMECHEAP_USERNAME}&ApiKey=${process.env.NAMECHEAP_API_KEY}&UserName=${process.env.NAMECHEAP_USERNAME}&Command=namecheap.domains.check&ClientIp=${ip.address()}&DomainList=${domainsToCheck.join(',')}`, (requestError, response, body) => {
-        if (requestError) exit(requestError);
+    // Namecheap won't allow you to query more than this many domains in a
+    // single API call.
+    const maxDomains = 50;
 
-        xml2js.parseString(body, (xmlParseError, result) => {
-            if (xmlParseError) exit(xmlParseError);
+    const domainArrays = splitArray(domainsToCheck, maxDomains);
 
-            const apiResponse = result.ApiResponse;
+    domainArrays.forEach(da => {
+        promises.push(new Promise((resolve, reject) => {
+            request(`${server}/xml.response?ApiUser=${process.env.NAMECHEAP_USERNAME}&ApiKey=${process.env.NAMECHEAP_API_KEY}&UserName=${process.env.NAMECHEAP_USERNAME}&Command=namecheap.domains.check&ClientIp=${ip.address()}&DomainList=${da.join(',')}`, (requestError, response, body) => {
+                if (requestError) {
+                    reject();
+                    exit(requestError);
+                }
 
-            if (apiResponse.$.Status.toLowerCase() === 'error') {
-                const apiErrors = [];
-                apiResponse.Errors.forEach(e1 => {
-                    e1.Error.forEach(e2 => apiErrors.push(e2._));
-                });
-                exit(apiErrors);
-            }
+                xml2js.parseString(body, (xmlParseError, result) => {
+                    if (xmlParseError) exit(xmlParseError);
 
-            apiResponse.CommandResponse.forEach(cr => {
-                cr.DomainCheckResult.forEach(dcr => {
-                    const resultDomain = dcr.$.Domain;
+                    const apiResponse = result.ApiResponse;
 
-                    // Cast the Available attribute to a boolean. "true" becomes
-                    // true. Everything else becomes false.
-                    const available = dcr.$.Available === 'true';
-
-                    domainsReturned.push(resultDomain);
-
-                    if (available) {
-                        availableDomains.push(resultDomain);
+                    if (apiResponse.$.Status.toLowerCase() === 'error') {
+                        const apiErrors = [];
+                        apiResponse.Errors.forEach(e1 => {
+                            e1.Error.forEach(e2 => apiErrors.push(e2._));
+                        });
+                        exit(apiErrors);
                     }
-                });
-            });
-        });
 
+                    apiResponse.CommandResponse.forEach(cr => {
+                        cr.DomainCheckResult.forEach(dcr => {
+                            const resultDomain = dcr.$.Domain;
+
+                            // Cast the Available attribute to a boolean. "true" becomes
+                            // true. Everything else becomes false.
+                            const available = dcr.$.Available === 'true';
+
+                            domainsReturned.push(resultDomain);
+
+                            if (available) {
+                                availableDomains.push(resultDomain);
+                            }
+                        });
+                    });
+                });
+
+                resolve();
+            });
+        }));
+    });
+
+    Promise.all(promises).then(() => {
         if (!availableDomains.length > 0) {
             console.log('No domains are currently available.');
         } else {
