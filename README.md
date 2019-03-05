@@ -2,10 +2,10 @@ domainspy monitors domains that you care about and emails you if any of them
 become available.
 
 domainspy uses the [Namecheap API](https://www.namecheap.com/support/api/intro.aspx).
-domainspy does not automatically purchase monitored domains because the
-Namecheap API [prohibits drop catching](https://www.namecheap.com/support/knowledgebase/article.aspx/9739/63/api--faq#b).
+domainspy does not automatically purchase monitored domains because [the
+Namecheap API prohibits drop catching](https://www.namecheap.com/support/knowledgebase/article.aspx/9739/63/api--faq#b).
 
-This documentation assumes that you will use [webtask](https://webtask.io/) to
+This documentation assumes that you will use [Webtask](https://webtask.io/) to
 run domainspy. You may be able to use similar services like AWS Lambda instead,
 but this has not been tested.
 
@@ -48,7 +48,9 @@ but this has not been tested.
     * Be sure to substitute the correct values for all secrets
     * `DOMAINS` should be a comma-separated list of domains that you want to monitor
 
-`wt create --name domainspy --secret "DOMAINS=example1.com,example2.com,example3.com" --secret "EMAIL_RECIPIENT=example@example.com" --secret "NAMECHEAP_USERNAME=namecheap-username" --secret "NAMECHEAP_API_KEY=namecheap-api-key" --secret "SENDGRID_API_KEY=sendgrid-api-key" index.js`
+<pre>
+wt create --name domainspy --secret "DOMAINS=example1.com,example2.com,example3.com" --secret "EMAIL_RECIPIENT=example@example.com" --secret "NAMECHEAP_USERNAME=namecheap-username" --secret "NAMECHEAP_API_KEY=namecheap-api-key" --secret "SENDGRID_API_KEY=sendgrid-api-key" index.js
+</pre>
 
 ### Usage
 
