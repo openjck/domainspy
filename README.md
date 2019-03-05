@@ -71,9 +71,7 @@ menu and add your new domain to the comma-separated `DOMAINS` list.
 ### Updating
 
 To use the latest version of domainspy on Webtask, pull the latest code and then
-run:
-
-`wt update domainspy index.js`
+run the installation command again.
 
 ### Test
 
