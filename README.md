@@ -44,12 +44,14 @@ but this has not been tested.
 #### Installation
 
 1. Clone this repository
-2. Run the following command while in the working directory
-    * Be sure to substitute the correct values for all secrets
-    * `DOMAINS` should be a comma-separated list of domains that you want to monitor
+2. Copy *.secrets.dist* to *.secrets* and provide values for all keys
+    * `DOMAINS` is a comma-separated list of domains that you want to monitor
+    * `EMAIL_RECIPIENT` is the email address that should receive alerts
+    * All other values should have been noted in the steps above
+3. Run the following command while in the working directory
 
 <pre>
-wt create --name domainspy --secret "DOMAINS=example1.com,example2.com,example3.com" --secret "EMAIL_RECIPIENT=example@example.com" --secret "NAMECHEAP_USERNAME=namecheap-username" --secret "NAMECHEAP_API_KEY=namecheap-api-key" --secret "SENDGRID_API_KEY=sendgrid-api-key" index.js
+wt create --name domainspy --secrets-file .secrets index.js
 </pre>
 
 ### Usage
