@@ -47,9 +47,7 @@ because [the Namecheap API prohibits drop catching](https://www.namecheap.com/su
     * `DOMAINS` is a comma-separated list of domains that you want to monitor
     * `EMAIL_RECIPIENT` is the email address that should receive alerts
     * All other values should have been noted in the steps above
-3. Run the following command while in the working directory
-
-`wt create --name domainspy --secrets-file .secrets index.js`
+3. Run this command while in the working directory: `wt create --name domainspy --secrets-file .secrets index.js`
 
 ### Usage
 
