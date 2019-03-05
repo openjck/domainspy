@@ -1,26 +1,31 @@
 module.exports = {
-    root: true,
-    env: {
-        es6: true,
-        node: true,
-    },
-    extends: 'eslint:recommended',
+    extends: [
+        'eslint:recommended',
+        'plugin:node/recommended',
+    ],
     plugins: [
         'json',
+        'node',
     ],
+    root: true,
+    env: {
+        node: true,
+    },
     rules: {
         // Errors
         'eqeqeq': 'error',
         'no-global-assign': 'error',
-        'no-redeclare': ['error', {builtinGlobals: true}],
-        'no-shadow': ['error', {builtinGlobals: true}],
+        'no-redeclare': ['error', { builtinGlobals: true }],
+        'no-shadow': ['error', { builtinGlobals: true }],
         'no-var': 'error',
 
-        // Warnings
+        // Stylistic warnings
         'prefer-arrow-callback': 'warn',
         'prefer-const': 'warn',
         'semi': ['warn', 'always'],
         'comma-dangle': ['warn', 'always-multiline'],
+        'quotes': ['warn', 'single', { avoidEscape: true }],
+        'indent': ['warn', 4, { SwitchCase: 1 }],
 
         // Off
         'no-console': 'off',

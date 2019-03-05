@@ -1,40 +1,132 @@
-require('dotenv').config();
-
-const fs = require('fs');
-const request = require('request');
 const ip = require('ip');
+const request = require('request-promise-native');
+const sgMail = require('@sendgrid/mail');
 const xml2js = require('xml2js');
 
 
-const configFile = 'domains.json';
+module.exports = async (context, callback) => {
+    const projectName = 'domainspy';
 
-if (fs.existsSync(configFile)) {
-    const server = getServer();
-    const domainsToCheck = JSON.parse(fs.readFileSync(configFile, 'utf8'));
-    checkDomains(server, domainsToCheck);
-} else {
-    exit(`Error: File ${configFile} does not exist.`);
-}
+    function fail(messageOrMessages) {
+        if (Array.isArray(messageOrMessages)) {
+            messageOrMessages.forEach(m => console.error('Error:', m));
+        } else {
+            console.error(messageOrMessages);
+        }
 
-/**
- * Print one or more error messages and exit.
- *
- * messageOrMessages can be either a string or an array of strings.
- */
-function exit(messageOrMessages, code = 1) {
-    if (Array.isArray(messageOrMessages)) {
-        messageOrMessages.forEach(m => console.error(m));
-    } else {
-        console.error(messageOrMessages);
+        email('Error', messageOrMessages);
+
+        return callback('Error: Task failed');
     }
 
-    process.exit(code);
-}
+    function email(subject, messageOrMessages) {
+        let body = '';
 
-function getServer() {
+        if (Array.isArray(messageOrMessages)) {
+            messageOrMessages.forEach(m => body += `${m}<br />`);
+        } else {
+            body = messageOrMessages;
+        }
+
+        const taggedSubject = `[${projectName}] ${subject}`;
+
+        console.log(body);
+        console.log(messageOrMessages);
+
+        sgMail.send({
+            to: context.secrets.EMAIL_RECIPIENT,
+            from: context.secrets.EMAIL_RECIPIENT,
+            subject: taggedSubject,
+            html: body,
+        });
+    }
+
+    sgMail.setApiKey(context.secrets.SENDGRID_API_KEY);
+
+    const server = getServer(context);
+    const domainsToCheck = context.secrets.DOMAINS.split(',');
+
+    const domainsReturned = [];
+    const availableDomains = [];
+
+    // Namecheap won't allow you to query more than this many domains in a
+    // single API call.
+    const maxDomains = 50;
+    const domainArrays = splitArray(domainsToCheck, maxDomains);
+
+    try {
+        for (const domainArray of domainArrays) {
+            const namecheapResult = await request(`${server}/xml.response?ApiUser=${context.secrets.NAMECHEAP_USERNAME}&ApiKey=${context.secrets.NAMECHEAP_API_KEY}&UserName=${context.secrets.NAMECHEAP_USERNAME}&Command=namecheap.domains.check&ClientIp=${ip.address()}&DomainList=${domainArray.join(',')}`);
+
+            xml2js.parseString(namecheapResult, (xmlParseError, { ApiResponse }) => {
+                if (xmlParseError) {
+                    throw xmlParseError;
+                }
+
+                if (ApiResponse.$.Status.toLowerCase() === 'error') {
+                    const apiErrors = [];
+                    ApiResponse.Errors.forEach(e1 => {
+                        e1.Error.forEach(e2 => apiErrors.push(e2._));
+                    });
+                    throw apiErrors;
+                }
+
+                ApiResponse.CommandResponse.forEach(cr => {
+                    cr.DomainCheckResult.forEach(dcr => {
+                        const resultDomain = dcr.$.Domain;
+
+                        // Cast the Available attribute to a boolean. "true" becomes
+                        // true. Everything else becomes false.
+                        const available = dcr.$.Available === 'true';
+
+                        domainsReturned.push(resultDomain);
+
+                        if (available) {
+                            availableDomains.push(resultDomain);
+                        }
+                    });
+                });
+            });
+        } // for loop
+
+        const missingDomainErrors = [];
+        domainsToCheck.forEach(domainToCheck => {
+            if (!domainsReturned.includes(domainToCheck)) {
+                missingDomainErrors.push(`Error: Couldn't get status of ${domainToCheck}.`);
+            }
+        });
+
+        if (missingDomainErrors.length > 0) {
+            throw missingDomainErrors;
+        }
+
+        if (availableDomains.length > 0) {
+            const messages = [];
+
+            availableDomains.forEach(ad => {
+                messages.push(`${ad} is available.`);
+            });
+
+            let subject;
+            if (availableDomains.length === 1) {
+                subject = 'A domain is available';
+            } else {
+                subject = 'Some domains are available';
+            }
+
+            email(subject, messages);
+        }
+
+        return callback(null, 'Task completed successfully');
+    } catch (err) {
+        return fail(err);
+    }
+};
+
+function getServer(context) {
     let server;
 
-    if (!process.env.SANDBOX || process.env.SANDBOX !== 'true') {
+    if (!context.secrets.SANDBOX || context.secrets.SANDBOX !== 'true') {
         server = 'https://api.namecheap.com';
     } else {
         server = 'https://api.sandbox.namecheap.com';
@@ -55,87 +147,11 @@ function getServer() {
  * http://www.frontcoded.com/splitting-javascript-array-into-chunks.html
  */
 function splitArray(array, size) {
-    const arrayGroup = [];
+    const arrayOfArrays = [];
 
     for (let i = 0; i < array.length; i += size) {
-        arrayGroup.push(array.slice(i, i + size));
+        arrayOfArrays.push(array.slice(i, i + size));
     }
 
-    return arrayGroup;
-}
-
-function checkDomains(server, domainsToCheck) {
-    const domainsReturned = [];
-    const availableDomains = [];
-    const promises = [];
-
-    // Namecheap won't allow you to query more than this many domains in a
-    // single API call.
-    const maxDomains = 50;
-
-    const domainArrays = splitArray(domainsToCheck, maxDomains);
-
-    domainArrays.forEach(da => {
-        promises.push(new Promise((resolve, reject) => {
-            request(`${server}/xml.response?ApiUser=${process.env.NAMECHEAP_USERNAME}&ApiKey=${process.env.NAMECHEAP_API_KEY}&UserName=${process.env.NAMECHEAP_USERNAME}&Command=namecheap.domains.check&ClientIp=${ip.address()}&DomainList=${da.join(',')}`, (requestError, response, body) => {
-                if (requestError) {
-                    reject();
-                    exit(requestError);
-                }
-
-                xml2js.parseString(body, (xmlParseError, result) => {
-                    if (xmlParseError) exit(xmlParseError);
-
-                    const apiResponse = result.ApiResponse;
-
-                    if (apiResponse.$.Status.toLowerCase() === 'error') {
-                        const apiErrors = [];
-                        apiResponse.Errors.forEach(e1 => {
-                            e1.Error.forEach(e2 => apiErrors.push(e2._));
-                        });
-                        exit(apiErrors);
-                    }
-
-                    apiResponse.CommandResponse.forEach(cr => {
-                        cr.DomainCheckResult.forEach(dcr => {
-                            const resultDomain = dcr.$.Domain;
-
-                            // Cast the Available attribute to a boolean. "true" becomes
-                            // true. Everything else becomes false.
-                            const available = dcr.$.Available === 'true';
-
-                            domainsReturned.push(resultDomain);
-
-                            if (available) {
-                                availableDomains.push(resultDomain);
-                            }
-                        });
-                    });
-                });
-
-                resolve();
-            });
-        }));
-    });
-
-    Promise.all(promises).then(() => {
-        if (!availableDomains.length > 0) {
-            console.log('No domains are currently available.');
-        } else {
-            availableDomains.forEach(ad => {
-                console.log(`${ad} is available.`);
-            });
-        }
-
-        const missingDomainErrors = [];
-        domainsToCheck.forEach(domainToCheck => {
-            if (!domainsReturned.includes(domainToCheck)) {
-                missingDomainErrors.push(`Error: Couldn't get status of ${domainToCheck}.`);
-            }
-        });
-
-        if (missingDomainErrors.length > 0) {
-            exit(missingDomainErrors);
-        }
-    });
+    return arrayOfArrays;
 }

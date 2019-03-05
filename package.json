@@ -1,21 +1,23 @@
 {
     "name": "domainspy",
     "private": true,
+    "engines": {
+        "node": ">=8.0.0"
+    },
     "scripts": {
-        "start": "node .",
-        "compile": "pkg --out-path bin index.js",
         "test": "npm run lint",
-        "lint": "eslint --ext .js,.json --ignore-pattern domains.json ."
+        "lint": "eslint --ext .js,.json ."
     },
     "dependencies": {
-        "dotenv": "6.2.0",
+        "@sendgrid/mail": "6.3.1",
         "ip": "1.1.5",
         "request": "2.88.0",
+        "request-promise-native": "1.0.7",
         "xml2js": "0.4.19"
     },
     "devDependencies": {
         "eslint": "5.15.0",
         "eslint-plugin-json": "1.4.0",
-        "pkg": "4.3.7"
+        "eslint-plugin-node": "8.0.1"
     }
 }
