@@ -1,13 +1,12 @@
 domainspy monitors domains that you care about and emails you if any of them
 become available.
 
-domainspy uses the [Namecheap API](https://www.namecheap.com/support/api/intro.aspx).
-domainspy does not automatically purchase monitored domains because [the
-Namecheap API prohibits drop catching](https://www.namecheap.com/support/knowledgebase/article.aspx/9739/63/api--faq#b).
+domainspy is not a hosted application. You must run it yourself by configuring
+[Namecheap](https://www.namecheap.com/), [Webtask](https://webtask.io/), and
+[SendGrid](https://sendgrid.com/docs/) according to the instructions below.
 
-This documentation assumes that you will use [Webtask](https://webtask.io/) to
-run domainspy. You may be able to use similar services like AWS Lambda instead,
-but this has not been tested.
+domainspy does not automatically purchase available domains because [the
+Namecheap API prohibits drop catching](https://www.namecheap.com/support/knowledgebase/article.aspx/9739/63/api--faq#b).
 
 ### Set up
 
