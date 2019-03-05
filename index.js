@@ -83,6 +83,9 @@ module.exports = async (context, callback) => {
 
                         if (available) {
                             availableDomains.push(resultDomain);
+                            console.log(`${resultDomain} is available`);
+                        } else {
+                            console.log(`${resultDomain} is not available`);
                         }
                     });
                 });
@@ -104,7 +107,7 @@ module.exports = async (context, callback) => {
             const messages = [];
 
             availableDomains.forEach(ad => {
-                messages.push(`${ad} is available.`);
+                messages.push(`${ad} is available`);
             });
 
             let subject;
