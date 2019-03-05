@@ -5,8 +5,8 @@ domainspy is not a hosted application. You must run it yourself by configuring
 [Namecheap](https://www.namecheap.com/), [Webtask](https://webtask.io/), and
 [SendGrid](https://sendgrid.com/docs/) according to the instructions below.
 
-domainspy does not automatically purchase available domains because [the
-Namecheap API prohibits drop catching](https://www.namecheap.com/support/knowledgebase/article.aspx/9739/63/api--faq#b).
+domainspy does not automatically purchase domains when they become available
+because [the Namecheap API prohibits drop catching](https://www.namecheap.com/support/knowledgebase/article.aspx/9739/63/api--faq#b).
 
 ### Set up
 
@@ -49,9 +49,7 @@ Namecheap API prohibits drop catching](https://www.namecheap.com/support/knowled
     * All other values should have been noted in the steps above
 3. Run the following command while in the working directory
 
-<pre>
-wt create --name domainspy --secrets-file .secrets index.js
-</pre>
+`wt create --name domainspy --secrets-file .secrets index.js`
 
 ### Usage
 
