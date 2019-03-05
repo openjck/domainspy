@@ -30,9 +30,6 @@ module.exports = async (context, callback) => {
 
         const taggedSubject = `[${projectName}] ${subject}`;
 
-        console.log(body);
-        console.log(messageOrMessages);
-
         sgMail.send({
             to: context.secrets.EMAIL_RECIPIENT,
             from: context.secrets.EMAIL_RECIPIENT,
