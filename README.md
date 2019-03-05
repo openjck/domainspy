@@ -68,11 +68,6 @@ be sent to spam.
 To add a domain, run `wt edit domainspy`. Access the secrets from the settings
 menu and add your new domain to the comma-separated `DOMAINS` list.
 
-### Updating
-
-To use the latest version of domainspy on Webtask, pull the latest code and then
-run the installation command again.
-
 ### Test
 
 Run `npm test`
