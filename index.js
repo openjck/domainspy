@@ -7,7 +7,7 @@ const xml2js = require('xml2js');
 module.exports = async (context, callback) => {
     const projectName = 'domainspy';
 
-    function fail(messageOrMessages) {
+    function fail(messageOrMessages, code = 1) {
         if (Array.isArray(messageOrMessages)) {
             messageOrMessages.forEach(m => console.error('Error:', m));
         } else {
@@ -16,19 +16,26 @@ module.exports = async (context, callback) => {
 
         email('Error', messageOrMessages);
 
-        return callback('Error: Task failed');
+        callback('Error: Task failed');
+
+        // eslint-disable-next-line no-process-exit
+        process.exit(code);
     }
 
     function email(subject, messageOrMessages) {
         let body = '';
 
         if (Array.isArray(messageOrMessages)) {
-            messageOrMessages.forEach(m => body += `${m}<br />`);
+            body = messageOrMessages.join('<br />');
         } else {
             body = messageOrMessages;
         }
 
         const taggedSubject = `[${projectName}] ${subject}`;
+
+        if (typeof body !== 'string' || body.length === 0) {
+            body = 'Unknown error';
+        }
 
         sgMail.send({
             to: context.secrets.EMAIL_RECIPIENT,
@@ -51,76 +58,72 @@ module.exports = async (context, callback) => {
     const maxDomains = 50;
     const domainArrays = splitArray(domainsToCheck, maxDomains);
 
-    try {
-        for (const domainArray of domainArrays) {
-            const namecheapResult = await request(`${server}/xml.response?ApiUser=${context.secrets.NAMECHEAP_USERNAME}&ApiKey=${context.secrets.NAMECHEAP_API_KEY}&UserName=${context.secrets.NAMECHEAP_USERNAME}&Command=namecheap.domains.check&ClientIp=${ip.address()}&DomainList=${domainArray.join(',')}`);
+    for (const domainArray of domainArrays) {
+        const namecheapResult = await request(`${server}/xml.response?ApiUser=${context.secrets.NAMECHEAP_USERNAME}&ApiKey=${context.secrets.NAMECHEAP_API_KEY}&UserName=${context.secrets.NAMECHEAP_USERNAME}&Command=namecheap.domains.check&ClientIp=${ip.address()}&DomainList=${domainArray.join(',')}`);
 
-            xml2js.parseString(namecheapResult, (xmlParseError, { ApiResponse }) => {
-                if (xmlParseError) {
-                    throw xmlParseError;
-                }
+        xml2js.parseString(namecheapResult, (xmlParseError, { ApiResponse }) => {
+            if (xmlParseError) {
+                fail(xmlParseError);
+            }
 
-                if (ApiResponse.$.Status.toLowerCase() === 'error') {
-                    const apiErrors = [];
-                    ApiResponse.Errors.forEach(e1 => {
-                        e1.Error.forEach(e2 => apiErrors.push(e2._));
-                    });
-                    throw apiErrors;
-                }
+            if (ApiResponse.$.Status.toLowerCase() === 'error') {
+                const apiErrors = [];
+                ApiResponse.Errors.forEach(e1 => {
+                    e1.Error.forEach(e2 => apiErrors.push(e2._.toString()));
+                });
+                fail(apiErrors);
+            }
 
-                ApiResponse.CommandResponse.forEach(cr => {
-                    cr.DomainCheckResult.forEach(dcr => {
-                        const resultDomain = dcr.$.Domain;
+            ApiResponse.CommandResponse.forEach(cr => {
+                cr.DomainCheckResult.forEach(dcr => {
+                    const resultDomain = dcr.$.Domain;
 
-                        // Cast the Available attribute to a boolean. "true" becomes
-                        // true. Everything else becomes false.
-                        const available = dcr.$.Available === 'true';
+                    // Cast the Available attribute to a boolean. "true" becomes
+                    // true. Everything else becomes false.
+                    const available = dcr.$.Available === 'true';
 
-                        domainsReturned.push(resultDomain);
+                    domainsReturned.push(resultDomain);
 
-                        if (available) {
-                            availableDomains.push(resultDomain);
-                            console.log(`${resultDomain} is available`);
-                        } else {
-                            console.log(`${resultDomain} is not available`);
-                        }
-                    });
+                    if (available) {
+                        availableDomains.push(resultDomain);
+                        console.log(`${resultDomain} is available`);
+                    } else {
+                        console.log(`${resultDomain} is not available`);
+                    }
                 });
             });
-        } // for loop
+        });
+    } // for loop
 
-        const missingDomainErrors = [];
-        domainsToCheck.forEach(domainToCheck => {
-            if (!domainsReturned.includes(domainToCheck)) {
-                missingDomainErrors.push(`Error: Couldn't get status of ${domainToCheck}.`);
-            }
+    const missingDomainErrors = [];
+    domainsToCheck.forEach(domainToCheck => {
+        if (!domainsReturned.includes(domainToCheck)) {
+            missingDomainErrors.push(`Error: Couldn't get status of ${domainToCheck}.`);
+        }
+    });
+
+    if (missingDomainErrors.length > 0) {
+        fail(missingDomainErrors);
+    }
+
+    if (availableDomains.length > 0) {
+        const messages = [];
+
+        availableDomains.forEach(ad => {
+            messages.push(`${ad} is available`);
         });
 
-        if (missingDomainErrors.length > 0) {
-            throw missingDomainErrors;
+        let subject;
+        if (availableDomains.length === 1) {
+            subject = 'A domain is available';
+        } else {
+            subject = 'Some domains are available';
         }
 
-        if (availableDomains.length > 0) {
-            const messages = [];
-
-            availableDomains.forEach(ad => {
-                messages.push(`${ad} is available`);
-            });
-
-            let subject;
-            if (availableDomains.length === 1) {
-                subject = 'A domain is available';
-            } else {
-                subject = 'Some domains are available';
-            }
-
-            email(subject, messages);
-        }
-
-        return callback(null, 'Task completed successfully');
-    } catch (err) {
-        return fail(err);
+        email(subject, messages);
     }
+
+    callback(null, 'Task completed successfully');
 };
 
 function getServer(context) {
