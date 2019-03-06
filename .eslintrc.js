@@ -1,13 +1,13 @@
 module.exports = {
-    extends: [
-        'eslint:recommended',
-        'plugin:node/recommended',
-    ],
+    root: true,
     plugins: [
         'json',
         'node',
     ],
-    root: true,
+    extends: [
+        'eslint:recommended',
+        'plugin:node/recommended',
+    ],
     env: {
         node: true,
     },
@@ -26,8 +26,5 @@ module.exports = {
         'comma-dangle': ['warn', 'always-multiline'],
         'quotes': ['warn', 'single', { avoidEscape: true }],
         'indent': ['warn', 4, { SwitchCase: 1 }],
-
-        // Off
-        'no-console': 'off',
     },
 };
