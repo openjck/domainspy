@@ -6,6 +6,7 @@
     },
     "scripts": {
         "test": "npm run lint",
+        "format": "prettier --write '**/*.js'",
         "lint": "eslint --ext .js,.json ."
     },
     "dependencies": {
@@ -15,7 +16,10 @@
         "xml2js": "0.4.19"
     },
     "devDependencies": {
+        "@openjck/eslint-config-base": "3.0.0",
+        "@openjck/prettier-config-base": "1.0.8",
         "eslint": "5.16.0",
+        "eslint-plugin-import": "2.16.0",
         "eslint-plugin-json": "1.4.0",
         "eslint-plugin-node": "8.0.1"
     }
