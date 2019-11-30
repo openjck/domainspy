@@ -1,11 +1,11 @@
 module.exports = {
     root: true,
-    plugins: ['json', 'node'],
-    extends: ['plugin:node/recommended', '@openjck/eslint-config-base'],
+    plugins: ["prettier", "json", "node"],
+    extends: ["airbnb-base", "plugin:node/recommended", "prettier"],
     env: {
-        node: true,
+        node: true
     },
     rules: {
-        'consistent-return': 'off',
-    },
+        "consistent-return": "off"
+    }
 };

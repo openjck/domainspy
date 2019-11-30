@@ -1,12 +1,11 @@
 root = true
 
-# Unix conventions
-[*]
-end_of_line = lf
-insert_final_newline = true
-
 [*]
 trim_trailing_whitespace = true
+
+# Unix line endings
+end_of_line = lf
+insert_final_newline = true
 
 [*.{js,json,md}]
 indent_style = space

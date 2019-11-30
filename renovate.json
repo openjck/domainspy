@@ -1,13 +1,9 @@
 {
-    "extends": [
-        "config:base"
-    ],
-    "packageRules": [{
-        "packagePatterns": [
-            "^@openjck/eslint-config-base$",
-            "^@openjck/prettier-config-base$",
-            "^eslint"
-        ],
-        "automerge": true
-    }]
+    "extends": ["config:base"],
+    "packageRules": [
+        {
+            "packagePatterns": ["^eslint"],
+            "automerge": true
+        }
+    ]
 }

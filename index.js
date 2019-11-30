@@ -1,9 +1,9 @@
-const ip = require('ip');
-const request = require('request');
-const sgMail = require('@sendgrid/mail');
-const xml2js = require('xml2js');
+const ip = require("ip");
+const request = require("request");
+const sgMail = require("@sendgrid/mail");
+const xml2js = require("xml2js");
 
-const projectName = 'domainspy';
+const projectName = "domainspy";
 let webtaskContext;
 let webtaskCallback;
 
@@ -31,12 +31,12 @@ function splitArray(arr, size) {
 function getAPIServer() {
     let apiServer;
 
-    const productionAPIServer = 'https://api.namecheap.com';
-    const stagingAPIServer = 'https://api.sandbox.namecheap.com';
+    const productionAPIServer = "https://api.namecheap.com";
+    const stagingAPIServer = "https://api.sandbox.namecheap.com";
 
     if (
         !webtaskContext.secrets.SANDBOX ||
-        webtaskContext.secrets.SANDBOX !== 'true'
+        webtaskContext.secrets.SANDBOX !== "true"
     ) {
         apiServer = productionAPIServer;
     } else {
@@ -53,15 +53,15 @@ function email(rawSubject, messageOrMessages) {
     const validMsgArray =
         Array.isArray(messageOrMessages) &&
         messageOrMessages.length > 0 &&
-        messageOrMessages.every(e => typeof e === 'string');
+        messageOrMessages.every(e => typeof e === "string");
 
     if (validMsgArray) {
-        body = messageOrMessages.join('\r\n');
-    } else if (typeof messageOrMessages === 'string') {
+        body = messageOrMessages.join("\r\n");
+    } else if (typeof messageOrMessages === "string") {
         body = messageOrMessages;
     } else {
-        rawSubjectToUse = 'Error';
-        body = 'Unknown error';
+        rawSubjectToUse = "Error";
+        body = "Unknown error";
     }
 
     sgMail.setApiKey(webtaskContext.secrets.SENDGRID_API_KEY);
@@ -70,7 +70,7 @@ function email(rawSubject, messageOrMessages) {
         to: webtaskContext.secrets.EMAIL_RECIPIENT,
         from: webtaskContext.secrets.EMAIL_RECIPIENT,
         subject: `[${projectName}] ${rawSubjectToUse}`,
-        text: body,
+        text: body
     });
 }
 
@@ -85,7 +85,7 @@ function processDomains(apiServer, domainsToCheck) {
 
     const domainGroups = splitArray(domainsToCheck, maxDomains);
 
-    for (let i = 0; i < domainGroups.length; i++) {
+    for (let i = 0; i < domainGroups.length; i += 1) {
         const domains = domainGroups[i];
 
         const namecheapAPIEndpoint = `${apiServer}/xml.response?ApiUser=${
@@ -93,7 +93,7 @@ function processDomains(apiServer, domainsToCheck) {
         }&ApiKey=${webtaskContext.secrets.NAMECHEAP_API_KEY}&UserName=${
             webtaskContext.secrets.NAMECHEAP_USERNAME
         }&Command=namecheap.domains.check&ClientIp=${ip.address()}&DomainList=${domains.join(
-            ',',
+            ","
         )}`;
 
         requestPromises.push(
@@ -111,7 +111,7 @@ function processDomains(apiServer, domainsToCheck) {
                             }
 
                             if (
-                                ApiResponse.$.Status.toLowerCase() === 'error'
+                                ApiResponse.$.Status.toLowerCase() === "error"
                             ) {
                                 const apiErrors = [];
                                 ApiResponse.Errors.forEach(e1 => {
@@ -131,55 +131,55 @@ function processDomains(apiServer, domainsToCheck) {
                                     // Cast the Available attribute to a boolean. "true" becomes
                                     // true. Everything else becomes false.
                                     const available =
-                                        dcr.$.Available === 'true';
+                                        dcr.$.Available === "true";
 
                                     if (available) {
                                         availableDomains.push(resultDomain);
 
                                         // eslint-disable-next-line no-console
                                         console.log(
-                                            `${resultDomain} is available`,
+                                            `${resultDomain} is available`
                                         );
                                     } else {
                                         // eslint-disable-next-line no-console
                                         console.log(
-                                            `${resultDomain} is not available`,
+                                            `${resultDomain} is not available`
                                         );
                                     }
 
                                     return resolve();
                                 }); // DomainCheckResult
                             }); // CommandResponse
-                        },
+                        }
                     ); // xml2js.parseString
                 }); // request
-            }),
+            })
         ); // Promise
     } // for
 
     Promise.all(requestPromises)
         .then(() => {
             const missingDomains = domainsToCheck.filter(
-                d => !domainsReturned.includes(d),
+                d => !domainsReturned.includes(d)
             );
             if (missingDomains.length > 0) {
                 throw missingDomains.map(
-                    md => `Could not get the status of ${md}`,
+                    md => `Could not get the status of ${md}`
                 );
             }
 
             if (availableDomains.length === 0) {
                 return webtaskCallback(
                     null,
-                    'SUCCESS: No domains are available',
+                    "SUCCESS: No domains are available"
                 );
             }
 
             let subject;
             if (availableDomains.length === 1) {
-                subject = 'A domain is available';
+                subject = "A domain is available";
             } else {
-                subject = 'Some domains are available';
+                subject = "Some domains are available";
             }
 
             const messages = availableDomains.map(ad => `${ad} is available!`);
@@ -189,8 +189,8 @@ function processDomains(apiServer, domainsToCheck) {
             return webtaskCallback(
                 null,
                 `SUCCESS: The following domains are available: ${availableDomains.join(
-                    ', ',
-                )}`,
+                    ", "
+                )}`
             );
         })
         .catch(err => {
@@ -198,16 +198,16 @@ function processDomains(apiServer, domainsToCheck) {
                 let errorMessage;
 
                 if (Array.isArray(err)) {
-                    errorMessage = err.map(e => e.toString()).join('; ');
+                    errorMessage = err.map(e => e.toString()).join("; ");
                 } else {
                     errorMessage = err.toString();
                 }
 
-                email('Error', errorMessage);
+                email("Error", errorMessage);
                 return webtaskCallback(`FAIL: ${errorMessage}`);
             } catch (innerErr) {
-                email('Error', 'Unknown error');
-                return webtaskCallback('FAIL: Unknown error');
+                email("Error", "Unknown error");
+                return webtaskCallback("FAIL: Unknown error");
             }
         });
 }
@@ -217,7 +217,7 @@ module.exports = (ctx, cb) => {
     webtaskCallback = cb;
 
     const apiServer = getAPIServer();
-    const domainsToCheck = webtaskContext.secrets.DOMAINS.split(',');
+    const domainsToCheck = webtaskContext.secrets.DOMAINS.split(",");
 
     processDomains(apiServer, domainsToCheck);
 };
