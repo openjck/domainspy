@@ -3,9 +3,9 @@ module.exports = {
     plugins: ["prettier", "json", "node"],
     extends: ["airbnb-base", "plugin:node/recommended", "prettier"],
     env: {
-        node: true
+        node: true,
     },
     rules: {
-        "consistent-return": "off"
-    }
+        "consistent-return": "off",
+    },
 };

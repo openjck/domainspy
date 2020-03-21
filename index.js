@@ -53,7 +53,7 @@ function email(rawSubject, messageOrMessages) {
     const validMsgArray =
         Array.isArray(messageOrMessages) &&
         messageOrMessages.length > 0 &&
-        messageOrMessages.every(e => typeof e === "string");
+        messageOrMessages.every((e) => typeof e === "string");
 
     if (validMsgArray) {
         body = messageOrMessages.join("\r\n");
@@ -70,7 +70,7 @@ function email(rawSubject, messageOrMessages) {
         to: webtaskContext.secrets.EMAIL_RECIPIENT,
         from: webtaskContext.secrets.EMAIL_RECIPIENT,
         subject: `[${projectName}] ${rawSubjectToUse}`,
-        text: body
+        text: body,
     });
 }
 
@@ -114,16 +114,16 @@ function processDomains(apiServer, domainsToCheck) {
                                 ApiResponse.$.Status.toLowerCase() === "error"
                             ) {
                                 const apiErrors = [];
-                                ApiResponse.Errors.forEach(e1 => {
-                                    e1.Error.forEach(e2 => {
+                                ApiResponse.Errors.forEach((e1) => {
+                                    e1.Error.forEach((e2) => {
                                         apiErrors.push(e2._);
                                     });
                                 });
                                 return reject(apiErrors);
                             }
 
-                            ApiResponse.CommandResponse.forEach(cr => {
-                                cr.DomainCheckResult.forEach(dcr => {
+                            ApiResponse.CommandResponse.forEach((cr) => {
+                                cr.DomainCheckResult.forEach((dcr) => {
                                     const resultDomain = dcr.$.Domain;
 
                                     domainsReturned.push(resultDomain);
@@ -160,11 +160,11 @@ function processDomains(apiServer, domainsToCheck) {
     Promise.all(requestPromises)
         .then(() => {
             const missingDomains = domainsToCheck.filter(
-                d => !domainsReturned.includes(d)
+                (d) => !domainsReturned.includes(d)
             );
             if (missingDomains.length > 0) {
                 throw missingDomains.map(
-                    md => `Could not get the status of ${md}`
+                    (md) => `Could not get the status of ${md}`
                 );
             }
 
@@ -182,7 +182,9 @@ function processDomains(apiServer, domainsToCheck) {
                 subject = "Some domains are available";
             }
 
-            const messages = availableDomains.map(ad => `${ad} is available!`);
+            const messages = availableDomains.map(
+                (ad) => `${ad} is available!`
+            );
 
             email(subject, messages);
 
@@ -193,12 +195,12 @@ function processDomains(apiServer, domainsToCheck) {
                 )}`
             );
         })
-        .catch(err => {
+        .catch((err) => {
             try {
                 let errorMessage;
 
                 if (Array.isArray(err)) {
-                    errorMessage = err.map(e => e.toString()).join("; ");
+                    errorMessage = err.map((e) => e.toString()).join("; ");
                 } else {
                     errorMessage = err.toString();
                 }
