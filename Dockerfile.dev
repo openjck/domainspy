@@ -1,0 +1,10 @@
+ARG DENO_VERSION
+
+FROM hayd/alpine-deno:${DENO_VERSION}
+
+# Set a custom working directory which we can later mount as a volume. This
+# could be named just about anything.
+WORKDIR /app
+
+# Copy all source files into the image
+COPY . .
