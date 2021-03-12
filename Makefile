@@ -1,30 +1,30 @@
-.PHONY: build-dev build-prod run trigger format lint shell-dev shell-prod
+.PHONY: build-base build-lambda format lint test deploy
 
 DENO_VERSION = 1.7.2
 
-build-dev:
+build-base:
 	docker image build \
-		--file Dockerfile.dev \
+		--target base \
 		--build-arg DENO_VERSION=$(DENO_VERSION) \
-		--tag domainspy-dev \
+		--tag domainspy-base \
 		.
 
-build-prod:
+build-lambda:
 	docker image build \
-		--file Dockerfile.prod \
+		--target lambda \
 		--build-arg DENO_VERSION=$(DENO_VERSION) \
-		--tag domainspy-prod \
+		--tag domainspy-lambda \
 		.
 
-format: build-dev
-	docker container run --rm --volume "$(shell pwd)":/app domainspy-dev deno fmt
+format: build-base
+	docker container run --rm --volume "$(shell pwd)":/app domainspy-base deno fmt
 
-lint: build-dev
-	docker container run --rm domainspy-dev deno fmt --check
-	docker container run --rm domainspy-dev deno lint --unstable
+lint: build-base
+	docker container run --rm domainspy-base deno fmt --check
+	docker container run --rm domainspy-base deno lint --unstable
 
-run: build-prod
-	docker container run --rm --publish 9000:8080 domainspy-prod
+test: build-lambda
+	./scripts/test.sh
 
-trigger:
-	http 'http://localhost:9000/2015-03-31/functions/function/invocations' payload='{}'
+deploy: build-base
+	docker container run --rm domainspy-base deno run --allow-read scripts/deploy.ts

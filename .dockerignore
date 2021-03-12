@@ -1,1 +1,5 @@
-.secrets
+config.dist.toml
+LICENSE
+Makefile
+README.md
+scripts/test.sh
