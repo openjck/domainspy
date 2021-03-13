@@ -3,8 +3,9 @@
 This project is currently unmaintained. The cloud function provider which it
 relied upon, Webtask, is no longer accepting new users.
 
-In truth, this project is very simple and could easily be rewritten by someone
-who has enough experience with sometihng like AWS.
+If you are using this project and would be interested in running it on AWS,
+please [email me](mailto:xwm8khcx@mailer.me). I would consider porting it if
+there is enough interest.
 
 ## Previous instructions
 
