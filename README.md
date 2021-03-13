@@ -3,9 +3,13 @@
 This project is currently unmaintained. The cloud function provider which it
 relied upon, Webtask, is no longer accepting new users.
 
-If you are using this project and would be interested in running it on AWS,
-please [email me](mailto:xwm8khcx@mailer.me). I would consider porting it if
-there is enough interest.
+There are also better tools for monitoring reserved domains, including ones from
+[GoDaddy](https://www.godaddy.com/domains/domain-backorder) and [Domain
+Hole](https://www.domainhole.com/alerts). If you are worried about either of
+those services snooping on your watchlists and grabbing domains before you do,
+it wouldn't be hard to rewrite this script to run on something more reliable
+like AWS. Note that AWS even has an [API for checking domain
+availability](https://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/Route53Domains.html#checkDomainAvailability-property).
 
 ## Previous instructions
 
