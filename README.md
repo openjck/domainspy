@@ -1,3 +1,13 @@
+## Status
+
+This project is currently unmaintained. The cloud function provider which it
+relied upon, Webtask, is no longer accepting new users.
+
+In truth, this project is very simple and could easily be rewritten by someone
+who has enough experience with sometihng like AWS.
+
+## Previous instructions
+
 domainspy monitors domains that you care about and emails you if any of them
 become available.
 
